@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personality Quiz - Discover Your True Self</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --sunset-orange: #ff6b6b;
+      --sunset-coral: #ff8e8e;
+      --sunset-peach: #ffb3ba;
+      --sunset-pink: #ffc1cc;
+      --lavender: #c8a2c8;
+      --sky-blue: #87ceeb;
+      --deep-blue: #4a90e2;
+      --ocean-blue: #5dade2;
+      --warm-orange: #ffa07a;
+      --soft-pink: #ffb6c1;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Floating background shapes */
+    .bg-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: float 20s infinite ease-in-out;
+    }
+
+    .shape:nth-child(1) {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--sunset-orange), var(--sunset-pink));
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .shape:nth-child(2) {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, var(--sky-blue), var(--deep-blue));
+      top: 60%;
+      right: 15%;
+      animation-delay: 3s;
+    }
+
+    .shape:nth-child(3) {
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, var(--lavender), var(--soft-pink));
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 6s;
+    }
+
+    .shape:nth-child(4) {
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, var(--warm-orange), var(--sunset-coral));
+      top: 30%;
+      right: 30%;
+      animation-delay: 9s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(120deg); }
+      66% { transform: translate(-20px, 20px) rotate(240deg); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.9), rgba(135, 206, 235, 0.9));
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      animation: fadeInUp 0.8s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .welcome-screen h1 {
+      font-size: 3rem;
+      background: linear-gradient(135deg, var(--sunset-orange), var(--deep-blue), var(--lavender));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .welcome-screen p {
+      font-size: 1.2rem;
+      color: #333;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .start-btn {
+      padding: 1rem 3rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, var(--sunset-orange), var(--sunset-coral));
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .start-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .start-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
+    }
+
+    .start-btn:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    /* Quiz Screen */
+    .quiz-screen {
+      display: none;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.95), rgba(135, 206, 235, 0.95));
+      border-radius: 30px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.5s ease;
+    }
+
+    .quiz-screen.active {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .progress-container {
+      margin-bottom: 2rem;
+    }
+
+    .progress-text {
+      font-size: 1rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .progress-bar-wrapper {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--sunset-orange), var(--sunset-coral), var(--sky-blue), var(--deep-blue));
+      border-radius: 10px;
+      transition: width 0.5s ease;
+      box-shadow: 0 2px 10px rgba(255, 107, 107, 0.5);
+    }
+
+    .question-container {
+      margin-bottom: 2rem;
+    }
+
+    .question-text {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      line-height: 1.4;
+    }
+
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .option {
+      padding: 1.2rem 1.5rem;
+      background: rgba(255, 255, 255, 0.8);
+      border: 3px solid transparent;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+      color: #333;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    .option:hover::before {
+      left: 100%;
+    }
+
+    .option:hover {
+      transform: translateX(10px) scale(1.02);
+      border-color: var(--sunset-orange);
+      box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .option.selected {
+      background: linear-gradient(135deg, var(--sunset-orange), var(--sunset-coral));
+      color: white;
+      border-color: var(--deep-blue);
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+      transform: translateX(10px) scale(1.03);
+    }
+
+    .option.selected::after {
+      content: '✓';
+      position: absolute;
+      right: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+    }
+
+    .next-btn {
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, var(--deep-blue), var(--sky-blue));
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+      transition: all 0.3s ease;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .next-btn.enabled {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .next-btn.enabled:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 35px rgba(74, 144, 226, 0.6);
+    }
+
+    .next-btn.enabled:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    /* Results Screen */
+    .results-screen {
+      display: none;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    .results-screen.active {
+      display: block;
+    }
+
+    .result-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.9), rgba(135, 206, 235, 0.9));
+      border-radius: 30px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .result-header h2 {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--sunset-orange), var(--deep-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      animation: slideInUp 0.6s ease;
+      animation-fill-mode: both;
+    }
+
+    .result-card:nth-child(1) { animation-delay: 0.1s; }
+    .result-card:nth-child(2) { animation-delay: 0.2s; }
+    .result-card:nth-child(3) { animation-delay: 0.3s; }
+    .result-card:nth-child(4) { animation-delay: 0.4s; }
+    .result-card:nth-child(5) { animation-delay: 0.5s; }
+    .result-card:nth-child(6) { animation-delay: 0.6s; }
+    .result-card:nth-child(7) { animation-delay: 0.7s; }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-card h3 {
+      font-size: 1.8rem;
+      color: var(--deep-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .result-card p {
+      font-size: 1.1rem;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    .personality-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--sunset-orange), var(--lavender), var(--deep-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+
+    /* Flag Meter */
+    .flag-meter-container {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .flag-meter {
+      flex: 1;
+    }
+
+    .flag-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .flag-label.green {
+      color: #27ae60;
+    }
+
+    .flag-label.red {
+      color: #e74c3c;
+    }
+
+    .flag-bar-wrapper {
+      width: 100%;
+      height: 30px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .flag-bar {
+      height: 100%;
+      border-radius: 15px;
+      transition: width 1.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .flag-bar.green {
+      background: linear-gradient(90deg, #27ae60, #2ecc71);
+    }
+
+    .flag-bar.red {
+      background: linear-gradient(90deg, #e74c3c, #c0392b);
+    }
+
+    .tips-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .tips-list li {
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(135, 206, 235, 0.3));
+      border-radius: 12px;
+      border-left: 4px solid var(--sunset-orange);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      animation: fadeInLeft 0.5s ease;
+      animation-fill-mode: both;
+    }
+
+    .tips-list li:nth-child(1) { animation-delay: 0.1s; }
+    .tips-list li:nth-child(2) { animation-delay: 0.2s; }
+    .tips-list li:nth-child(3) { animation-delay: 0.3s; }
+    .tips-list li:nth-child(4) { animation-delay: 0.4s; }
+    .tips-list li:nth-child(5) { animation-delay: 0.5s; }
+    .tips-list li:nth-child(6) { animation-delay: 0.6s; }
+
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .retake-btn {
+      background: linear-gradient(135deg, var(--sunset-orange), var(--sunset-coral));
+      color: white;
+    }
+
+    .share-btn {
+      background: linear-gradient(135deg, var(--deep-blue), var(--sky-blue));
+      color: white;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    .share-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      display: none;
+    }
+
+    .share-section.active {
+      display: block;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .share-textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 1rem;
+      border: 2px solid var(--deep-blue);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+
+    .copy-btn {
+      padding: 0.8rem 1.5rem;
+      background: linear-gradient(135deg, var(--deep-blue), var(--sky-blue));
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .copy-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+    }
+
+    .copy-btn.copied {
+      background: linear-gradient(135deg, #27ae60, #2ecc71);
+    }
+
+    @media (max-width: 600px) {
+      .welcome-screen h1 {
+        font-size: 2rem;
+      }
+
+      .question-text {
+        font-size: 1.4rem;
+      }
+
+      .flag-meter-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <div class="container">
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+      <h1>🌟 Discover Your True Self 🌟</h1>
+      <p>Take this fun 10-question personality quiz to uncover your unique traits, spirit animal, ideal pet, and personalized insights!</p>
+      <button class="start-btn" onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div class="quiz-screen" id="quizScreen">
+      <div class="progress-container">
+        <div class="progress-text" id="progressText">Question 1 of 10</div>
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar" id="progressBar" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <div class="question-container">
+        <div class="question-text" id="questionText"></div>
+        <div class="options-container" id="optionsContainer"></div>
+      </div>
+
+      <div class="quiz-controls">
+        <div></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div class="results-screen" id="resultsScreen">
+      <div class="result-header">
+        <h2>🎉 Your Results Are Ready! 🎉</h2>
+      </div>
+
+      <div class="result-card">
+        <div class="personality-title" id="personalityTitle"></div>
+        <p id="personalityDesc"></p>
+      </div>
+
+      <div class="result-card">
+        <h3>🦋 Your Spirit Animal</h3>
+        <p id="spiritAnimal"></p>
+      </div>
+
+      <div class="result-card">
+        <h3>🐾 Best Pet For You</h3>
+        <p id="bestPet"></p>
+      </div>
+
+      <div class="result-card">
+        <h3>✨ What Suits You</h3>
+        <p><strong>Color Palette:</strong> <span id="colorPalette"></span></p>
+        <p style="margin-top: 0.8rem;"><strong>Ideal Food:</strong> <span id="idealFood"></span></p>
+        <p style="margin-top: 0.8rem;"><strong>Fashion Style:</strong> <span id="fashionStyle"></span></p>
+        <p style="margin-top: 0.8rem;"><strong>Lifestyle:</strong> <span id="lifestyle"></span></p>
+      </div>
+
+      <div class="result-card">
+        <h3>🚩 Red Flag vs Green Flag Meter</h3>
+        <div class="flag-meter-container">
+          <div class="flag-meter">
+            <div class="flag-label green">
+              <span>Green Flag</span>
+              <span id="greenFlagPercent">0%</span>
+            </div>
+            <div class="flag-bar-wrapper">
+              <div class="flag-bar green" id="greenFlagBar" style="width: 0%">0%</div>
+            </div>
+          </div>
+          <div class="flag-meter">
+            <div class="flag-label red">
+              <span>Red Flag</span>
+              <span id="redFlagPercent">0%</span>
+            </div>
+            <div class="flag-bar-wrapper">
+              <div class="flag-bar red" id="redFlagBar" style="width: 0%">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <h3>💡 Personalized Improvement Tips</h3>
+        <ul class="tips-list" id="tipsList"></ul>
+      </div>
+
+      <div class="action-buttons">
+        <button class="action-btn retake-btn" onclick="retakeQuiz()">🔄 Retake Quiz</button>
+        <button class="action-btn share-btn" onclick="toggleShare()">📤 Share Result</button>
+      </div>
+
+      <div class="share-section" id="shareSection">
+        <h3 style="margin-bottom: 1rem;">Copy Your Result Summary</h3>
+        <textarea class="share-textarea" id="shareTextarea" readonly></textarea>
+        <button class="copy-btn" onclick="copyResult()">📋 Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── Quiz Data ──────────────────────────────────────────────────────────
+    const questions = [
+      {
+        question: "How do you handle stress?",
+        options: [
+          { text: "Take a deep breath and plan my approach", value: "calm" },
+          { text: "Talk it out with friends or family", value: "social" },
+          { text: "Need some alone time to process", value: "introvert" },
+          { text: "Jump into action immediately", value: "active" }
+        ]
+      },
+      {
+        question: "What's your ideal weekend?",
+        options: [
+          { text: "Adventure and exploring new places", value: "adventurous" },
+          { text: "Cozy day at home with hobbies", value: "homebody" },
+          { text: "Socializing with friends", value: "social" },
+          { text: "Learning something new or reading", value: "intellectual" }
+        ]
+      },
+      {
+        question: "When making decisions, you:",
+        options: [
+          { text: "Analyze all options carefully", value: "analytical" },
+          { text: "Go with your gut feeling", value: "intuitive" },
+          { text: "Ask others for advice", value: "collaborative" },
+          { text: "Choose quickly and adapt later", value: "flexible" }
+        ]
+      },
+      {
+        question: "Your favorite color palette is:",
+        options: [
+          { text: "Warm oranges and corals", value: "warm" },
+          { text: "Cool blues and purples", value: "cool" },
+          { text: "Soft pinks and lavenders", value: "soft" },
+          { text: "Bold and vibrant colors", value: "bold" }
+        ]
+      },
+      {
+        question: "How do you express emotions?",
+        options: [
+          { text: "Openly and freely", value: "expressive" },
+          { text: "Through actions more than words", value: "practical" },
+          { text: "Prefer to keep them private", value: "reserved" },
+          { text: "Use humor and lightheartedness", value: "humorous" }
+        ]
+      },
+      {
+        question: "In a group setting, you:",
+        options: [
+          { text: "Take the lead and organize", value: "leader" },
+          { text: "Support others and help out", value: "supporter" },
+          { text: "Observe and contribute when needed", value: "observer" },
+          { text: "Bring energy and enthusiasm", value: "energetic" }
+        ]
+      },
+      {
+        question: "Your ideal food type is:",
+        options: [
+          { text: "Comfort food and home-cooked meals", value: "comfort" },
+          { text: "Exotic and adventurous cuisine", value: "adventurous" },
+          { text: "Healthy and fresh options", value: "healthy" },
+          { text: "Sweet treats and desserts", value: "sweet" }
+        ]
+      },
+      {
+        question: "When facing a challenge, you:",
+        options: [
+          { text: "Break it into smaller steps", value: "methodical" },
+          { text: "Dive in headfirst", value: "bold" },
+          { text: "Seek guidance and support", value: "collaborative" },
+          { text: "Take time to reflect first", value: "reflective" }
+        ]
+      },
+      {
+        question: "Your communication style is:",
+        options: [
+          { text: "Direct and straightforward", value: "direct" },
+          { text: "Warm and empathetic", value: "empathetic" },
+          { text: "Enthusiastic and animated", value: "enthusiastic" },
+          { text: "Thoughtful and measured", value: "thoughtful" }
+        ]
+      },
+      {
+        question: "What energizes you most?",
+        options: [
+          { text: "Nature and outdoor activities", value: "nature" },
+          { text: "Creative projects and art", value: "creative" },
+          { text: "Meaningful conversations", value: "social" },
+          { text: "Achieving goals and success", value: "achievement" }
+        ]
+      }
+    ];
+
+    // ─── State ─────────────────────────────────────────────────────────────
+    let currentQuestion = 0;
+    let answers = [];
+    let selectedOption = null;
+
+    // ─── Personality Type Definitions ──────────────────────────────────────
+    const personalityTypes = {
+      calm: {
+        title: "The Ocean Strategist",
+        desc: "You're thoughtful, composed, and approach life with a clear plan. Your calm demeanor helps you navigate challenges with grace and wisdom.",
+        spiritAnimal: "Dolphin - Intelligent, playful, and always moving forward with purpose. You share their calm confidence and social intelligence.",
+        pet: "Golden Retriever - Loyal, gentle, and always there to support you. Their calm energy matches your steady approach to life.",
+        colorPalette: "Deep ocean blues mixed with soft coral accents - representing depth and warmth",
+        food: "Mediterranean cuisine - balanced, fresh, and thoughtfully prepared",
+        fashion: "Classic, timeless pieces with subtle elegance",
+        lifestyle: "Balanced routine with time for reflection, nature walks, and meaningful connections"
+      },
+      social: {
+        title: "The Sunset Connector",
+        desc: "You thrive on connections and bring warmth to every interaction. Your social nature makes you a natural bridge between people.",
+        spiritAnimal: "Elephant - Wise, social, and deeply connected to your community. You value relationships and have a strong memory for meaningful moments.",
+        pet: "Labrador - Friendly, outgoing, and loves being part of the family. Perfect companion for your social lifestyle.",
+        colorPalette: "Warm sunset oranges and soft pinks - radiating warmth and connection",
+        food: "Family-style meals and shared dining experiences",
+        fashion: "Comfortable, approachable style that invites conversation",
+        lifestyle: "Active social calendar with friends, community events, and group activities"
+      },
+      introvert: {
+        title: "The Lavender Dreamer",
+        desc: "You find strength in solitude and depth in quiet moments. Your introspective nature allows you to see beauty others might miss.",
+        spiritAnimal: "Owl - Wise, observant, and comfortable in the quiet of night. You share their ability to see what others don't notice.",
+        pet: "Cat - Independent, graceful, and appreciates quiet companionship. They understand your need for personal space.",
+        colorPalette: "Soft lavenders and muted purples - peaceful and introspective",
+        food: "Comforting, simple meals that nourish both body and soul",
+        fashion: "Cozy, soft textures with understated elegance",
+        lifestyle: "Quiet mornings, reading nooks, and meaningful solo activities"
+      },
+      active: {
+        title: "The Coral Adventurer",
+        desc: "You're dynamic, energetic, and always ready for the next challenge. Your active approach to life inspires those around you.",
+        spiritAnimal: "Cheetah - Fast, focused, and always in motion. You share their drive and determination.",
+        pet: "Border Collie - Intelligent, energetic, and loves activities. Perfect match for your active lifestyle.",
+        colorPalette: "Vibrant corals and energetic oranges - full of life and movement",
+        food: "Protein-rich, energizing meals that fuel your adventures",
+        fashion: "Athletic, functional style that moves with you",
+        lifestyle: "Outdoor adventures, fitness, and always seeking new experiences"
+      },
+      adventurous: {
+        title: "The Sky Explorer",
+        desc: "You're curious, brave, and always seeking new horizons. Your adventurous spirit leads you to amazing discoveries.",
+        spiritAnimal: "Eagle - Soaring high, seeing far, and always exploring new territories. You share their freedom and vision.",
+        pet: "Australian Shepherd - Active, intelligent, and loves exploring. They'll be your perfect adventure companion.",
+        colorPalette: "Sky blues and sunrise yellows - representing endless possibilities",
+        food: "International cuisine and trying new flavors from around the world",
+        fashion: "Versatile, travel-ready style with a sense of adventure",
+        lifestyle: "Travel, exploration, and always planning the next adventure"
+      },
+      homebody: {
+        title: "The Peach Nest Builder",
+        desc: "You create beautiful, comfortable spaces and find joy in the simple pleasures of home. Your nurturing nature makes anywhere feel like home.",
+        spiritAnimal: "Rabbit - Gentle, home-loving, and creates cozy spaces. You share their appreciation for comfort and safety.",
+        pet: "Corgi - Charming, home-loving, and brings joy to everyday moments. Perfect for your cozy lifestyle.",
+        colorPalette: "Warm peaches and soft creams - creating a sense of home and comfort",
+        food: "Homemade comfort food and baking projects",
+        fashion: "Cozy, comfortable style that feels like a warm hug",
+        lifestyle: "Home improvement, gardening, and creating beautiful spaces"
+      },
+      intellectual: {
+        title: "The Deep Blue Thinker",
+        desc: "You're curious, analytical, and love diving deep into ideas. Your intellectual nature drives you to understand the world around you.",
+        spiritAnimal: "Raven - Intelligent, curious, and always learning. You share their wisdom and problem-solving abilities.",
+        pet: "Poodle - Intelligent, trainable, and enjoys mental stimulation. Perfect companion for your curious mind.",
+        colorPalette: "Deep blues and rich purples - representing depth and wisdom",
+        food: "Sophisticated cuisine with interesting flavors and techniques",
+        fashion: "Thoughtful, well-curated style with attention to detail",
+        lifestyle: "Reading, learning, museums, and intellectual pursuits"
+      },
+      analytical: {
+        title: "The Structured Strategist",
+        desc: "You approach life with logic and careful planning. Your analytical mind helps you solve problems others find complex.",
+        spiritAnimal: "Wolf - Strategic, loyal, and works well in structured groups. You share their methodical approach.",
+        pet: "German Shepherd - Intelligent, loyal, and thrives on structure. They match your organized lifestyle.",
+        colorPalette: "Cool blues and structured grays - representing clarity and precision",
+        food: "Well-balanced, nutritious meals planned thoughtfully",
+        fashion: "Clean lines, structured pieces, and timeless elegance",
+        lifestyle: "Organized routines, planning, and systematic approaches to goals"
+      },
+      intuitive: {
+        title: "The Mystic Dreamer",
+        desc: "You trust your instincts and see beyond the surface. Your intuitive nature guides you to make decisions that feel right.",
+        spiritAnimal: "Butterfly - Transformative, intuitive, and follows their instincts. You share their ability to sense what's right.",
+        pet: "Siamese Cat - Intuitive, vocal, and forms deep bonds. They understand your emotional depth.",
+        colorPalette: "Mystical purples and intuitive indigos - representing inner wisdom",
+        food: "Intuitive eating - foods that feel right for your body and mood",
+        fashion: "Expressive, unique style that reflects your inner self",
+        lifestyle: "Meditation, intuition development, and following your inner guidance"
+      },
+      collaborative: {
+        title: "The Harmony Builder",
+        desc: "You bring people together and create harmony in groups. Your collaborative nature makes you a natural team player.",
+        spiritAnimal: "Bee - Works together, creates harmony, and contributes to the whole. You share their collaborative spirit.",
+        pet: "Beagle - Friendly, social, and loves being part of the pack. Perfect for your collaborative nature.",
+        colorPalette: "Harmonious greens and soft yellows - representing balance and unity",
+        food: "Potluck dinners and shared meals that bring people together",
+        fashion: "Approachable, friendly style that makes others feel comfortable",
+        lifestyle: "Team activities, community involvement, and collaborative projects"
+      },
+      flexible: {
+        title: "The Flowing River",
+        desc: "You adapt easily and go with the flow. Your flexible nature allows you to thrive in any situation.",
+        spiritAnimal: "Water - Flowing, adaptable, and takes the shape of any container. You share its flexibility.",
+        pet: "Mixed Breed - Adaptable, unique, and goes with the flow. Perfect match for your flexible nature.",
+        colorPalette: "Flowing blues and adaptable greens - representing flexibility and growth",
+        food: "Variety and trying whatever feels right in the moment",
+        fashion: "Versatile, mix-and-match style that adapts to any occasion",
+        lifestyle: "Open to new experiences, adaptable routines, and going with the flow"
+      },
+      warm: {
+        title: "The Golden Sunbeam",
+        desc: "You radiate warmth and bring light to every room. Your warm nature makes others feel comfortable and valued.",
+        spiritAnimal: "Lion - Warm, confident, and brings light to the pride. You share their radiant warmth.",
+        pet: "Golden Retriever - Warm, friendly, and radiates joy. Perfect companion for your sunny disposition.",
+        colorPalette: "Warm oranges, golden yellows, and soft corals - radiating sunshine",
+        food: "Comforting, warm meals that bring people together",
+        fashion: "Warm, inviting style with golden and coral accents",
+        lifestyle: "Sunny days, outdoor gatherings, and spreading warmth to others"
+      },
+      cool: {
+        title: "The Serene Wave",
+        desc: "You bring calm and clarity wherever you go. Your cool demeanor helps others find peace in chaos.",
+        spiritAnimal: "Whale - Deep, calm, and brings serenity. You share their peaceful, powerful presence.",
+        pet: "Husky - Cool, calm, and brings a sense of peace. Perfect match for your serene nature.",
+        colorPalette: "Cool blues, ocean teals, and serene purples - representing calm and depth",
+        food: "Fresh, light meals that refresh and energize",
+        fashion: "Cool, calm style with blues and purples",
+        lifestyle: "Water activities, peaceful moments, and creating calm spaces"
+      },
+      soft: {
+        title: "The Gentle Bloom",
+        desc: "You bring softness and beauty to the world. Your gentle nature creates a safe space for others to grow.",
+        spiritAnimal: "Deer - Gentle, graceful, and moves with softness. You share their gentle, beautiful nature.",
+        pet: "Cavalier King Charles Spaniel - Gentle, soft, and brings comfort. Perfect for your gentle soul.",
+        colorPalette: "Soft pinks, lavender, and peach - gentle and nurturing",
+        food: "Delicate, beautifully presented meals that nourish gently",
+        fashion: "Soft textures, flowing fabrics, and gentle colors",
+        lifestyle: "Gentle activities, peaceful moments, and nurturing environments"
+      },
+      bold: {
+        title: "The Vibrant Flame",
+        desc: "You're bold, confident, and unafraid to stand out. Your vibrant energy inspires others to be themselves.",
+        spiritAnimal: "Phoenix - Bold, vibrant, and rises with energy. You share their fearless, colorful nature.",
+        pet: "Dalmatian - Bold, unique, and stands out. Perfect match for your vibrant personality.",
+        colorPalette: "Bold magentas, vibrant oranges, and electric blues - full of energy",
+        food: "Bold flavors, spicy dishes, and adventurous combinations",
+        fashion: "Bold, statement pieces that express your vibrant self",
+        lifestyle: "Exciting activities, bold choices, and living life to the fullest"
+      },
+      expressive: {
+        title: "The Colorful Storyteller",
+        desc: "You express yourself freely and bring color to every conversation. Your expressive nature helps others open up.",
+        spiritAnimal: "Peacock - Expressive, colorful, and shares beauty freely. You share their vibrant expression.",
+        pet: "Parrot - Expressive, colorful, and loves to communicate. Perfect companion for your expressive nature.",
+        colorPalette: "Rainbow spectrum - all colors expressing your vibrant personality",
+        food: "Colorful, visually appealing meals that are as expressive as you",
+        fashion: "Expressive, colorful style that tells your story",
+        lifestyle: "Creative expression, art, music, and sharing your colorful self"
+      },
+      practical: {
+        title: "The Grounded Builder",
+        desc: "You're practical, reliable, and get things done. Your grounded nature makes you someone others can depend on.",
+        spiritAnimal: "Bear - Strong, practical, and builds what's needed. You share their grounded strength.",
+        pet: "Bulldog - Practical, reliable, and steady. Perfect match for your grounded nature.",
+        colorPalette: "Earthy browns, practical grays, and stable greens - grounded and reliable",
+        food: "Practical, nutritious meals that fuel your productive life",
+        fashion: "Functional, practical style that works for everyday life",
+        lifestyle: "Building, creating, and practical projects that make a difference"
+      },
+      reserved: {
+        title: "The Quiet Depth",
+        desc: "You have depth that others discover over time. Your reserved nature holds beautiful mysteries.",
+        spiritAnimal: "Turtle - Reserved, wise, and carries depth within. You share their quiet strength.",
+        pet: "Shih Tzu - Reserved, elegant, and reveals beauty gradually. Perfect for your reserved nature.",
+        colorPalette: "Deep, rich colors with subtle complexity - mysterious and deep",
+        food: "Sophisticated, complex flavors that reveal themselves gradually",
+        fashion: "Elegant, reserved style with hidden details",
+        lifestyle: "Quiet activities, deep connections, and meaningful moments"
+      },
+      humorous: {
+        title: "The Joyful Spark",
+        desc: "You bring laughter and light to every situation. Your humorous nature helps others see the brighter side.",
+        spiritAnimal: "Otter - Playful, humorous, and brings joy. You share their lighthearted spirit.",
+        pet: "French Bulldog - Humorous, playful, and brings smiles. Perfect companion for your joyful nature.",
+        colorPalette: "Bright, cheerful colors - yellows, oranges, and playful pinks",
+        food: "Fun, playful meals that bring joy and laughter",
+        fashion: "Playful, fun style that expresses your humor",
+        lifestyle: "Laughter, fun activities, and bringing joy to others"
+      },
+      leader: {
+        title: "The Guiding Star",
+        desc: "You naturally take charge and guide others forward. Your leadership inspires confidence and direction.",
+        spiritAnimal: "Eagle - Leads, soars high, and guides the way. You share their natural leadership.",
+        pet: "Doberman - Confident, protective, and natural leader. Perfect match for your leadership qualities.",
+        colorPalette: "Bold, confident colors - deep blues and commanding purples",
+        food: "Executive meals - sophisticated and well-planned",
+        fashion: "Confident, leadership style that commands respect",
+        lifestyle: "Leading projects, mentoring others, and achieving goals"
+      },
+      supporter: {
+        title: "The Nurturing Heart",
+        desc: "You lift others up and support their dreams. Your nurturing nature makes you a pillar of strength for others.",
+        spiritAnimal: "Mother Bear - Nurturing, protective, and supports the pack. You share their caring nature.",
+        pet: "Saint Bernard - Nurturing, gentle giant, and always there to help. Perfect for your supportive nature.",
+        colorPalette: "Warm, nurturing colors - soft pinks and comforting creams",
+        food: "Nurturing meals that comfort and support",
+        fashion: "Comfortable, supportive style that makes others feel cared for",
+        lifestyle: "Supporting others, volunteering, and nurturing relationships"
+      },
+      observer: {
+        title: "The Wise Watcher",
+        desc: "You see what others miss and understand situations deeply. Your observant nature gives you unique insights.",
+        spiritAnimal: "Hawk - Observant, sees far, and understands deeply. You share their keen observation.",
+        pet: "Greyhound - Observant, calm, and sees everything. Perfect match for your observant nature.",
+        colorPalette: "Subtle, observant colors - soft grays and watchful blues",
+        food: "Thoughtful meals that allow you to observe and enjoy",
+        fashion: "Subtle, observant style that notices details",
+        lifestyle: "People-watching, deep observation, and understanding the world"
+      },
+      energetic: {
+        title: "The Radiant Dynamo",
+        desc: "You bring energy and enthusiasm everywhere you go. Your vibrant energy is contagious and inspiring.",
+        spiritAnimal: "Cheetah - Energetic, fast, and full of life. You share their dynamic energy.",
+        pet: "Jack Russell Terrier - Energetic, enthusiastic, and always ready. Perfect for your energetic lifestyle.",
+        colorPalette: "Energetic, vibrant colors - bright oranges and electric blues",
+        food: "Energy-boosting meals that fuel your active life",
+        fashion: "Dynamic, energetic style that moves with you",
+        lifestyle: "High-energy activities, sports, and always on the move"
+      },
+      comfort: {
+        title: "The Cozy Creator",
+        desc: "You find joy in comfort and create warm, inviting spaces. Your comfort-focused nature brings peace to others.",
+        spiritAnimal: "Sloth - Comfortable, peaceful, and finds joy in slow moments. You share their love of comfort.",
+        pet: "Persian Cat - Comfortable, luxurious, and loves cozy spaces. Perfect match for your comfort-loving nature.",
+        colorPalette: "Cozy, warm colors - soft browns and comforting creams",
+        food: "Comfort food that warms the soul and brings peace",
+        fashion: "Cozy, comfortable style that feels like home",
+        lifestyle: "Cozy spaces, comfort activities, and creating warmth"
+      },
+      healthy: {
+        title: "The Vital Bloom",
+        desc: "You prioritize health and vitality in all aspects of life. Your healthy approach inspires others to take care of themselves.",
+        spiritAnimal: "Gazelle - Healthy, graceful, and full of vitality. You share their vibrant health.",
+        pet: "Vizsla - Healthy, active, and full of vitality. Perfect companion for your healthy lifestyle.",
+        colorPalette: "Fresh, healthy colors - greens, fresh blues, and vibrant yellows",
+        food: "Fresh, healthy meals that nourish and energize",
+        fashion: "Fresh, healthy style that reflects your vitality",
+        lifestyle: "Fitness, healthy habits, and vibrant living"
+      },
+      sweet: {
+        title: "The Sugar Dream",
+        desc: "You bring sweetness and joy to life. Your sweet nature makes everything a little brighter.",
+        spiritAnimal: "Panda - Sweet, gentle, and brings joy. You share their sweet, lovable nature.",
+        pet: "Bichon Frise - Sweet, fluffy, and brings joy. Perfect match for your sweet personality.",
+        colorPalette: "Sweet, pastel colors - soft pinks, creams, and gentle yellows",
+        food: "Sweet treats and desserts that bring joy and happiness",
+        fashion: "Sweet, charming style that's as delightful as you",
+        lifestyle: "Sweet moments, joyful activities, and spreading happiness"
+      },
+      methodical: {
+        title: "The Precise Architect",
+        desc: "You build things step by step with careful planning. Your methodical approach creates lasting results.",
+        spiritAnimal: "Beaver - Methodical, builds carefully, and creates lasting structures. You share their methodical nature.",
+        pet: "Border Collie - Methodical, trainable, and follows routines. Perfect for your methodical lifestyle.",
+        colorPalette: "Structured, precise colors - organized blues and systematic grays",
+        food: "Methodically prepared meals with attention to detail",
+        fashion: "Structured, precise style with attention to detail",
+        lifestyle: "Step-by-step projects, organized routines, and methodical progress"
+      },
+      bold: {
+        title: "The Fearless Pioneer",
+        desc: "You're bold, brave, and unafraid to take risks. Your bold nature opens doors others are afraid to approach.",
+        spiritAnimal: "Tiger - Bold, fearless, and takes risks. You share their fearless courage.",
+        pet: "Rottweiler - Bold, confident, and fearless. Perfect match for your bold personality.",
+        colorPalette: "Bold, fearless colors - deep reds and powerful blacks",
+        food: "Bold, adventurous meals that take risks",
+        fashion: "Bold, fearless style that commands attention",
+        lifestyle: "Bold adventures, taking risks, and fearless living"
+      },
+      reflective: {
+        title: "The Deep Pond",
+        desc: "You reflect deeply and see things others miss. Your reflective nature brings wisdom and insight.",
+        spiritAnimal: "Swan - Reflective, graceful, and sees depth. You share their reflective beauty.",
+        pet: "Maine Coon - Reflective, wise, and sees deeply. Perfect for your reflective nature.",
+        colorPalette: "Reflective, deep colors - mirror-like blues and thoughtful grays",
+        food: "Thoughtful meals that allow reflection and contemplation",
+        fashion: "Reflective, thoughtful style with depth",
+        lifestyle: "Reflection, meditation, and deep contemplation"
+      },
+      direct: {
+        title: "The Clear Arrow",
+        desc: "You communicate clearly and directly. Your straightforward nature helps others understand exactly where they stand.",
+        spiritAnimal: "Falcon - Direct, focused, and gets straight to the point. You share their direct approach.",
+        pet: "Weimaraner - Direct, focused, and clear in communication. Perfect match for your direct nature.",
+        colorPalette: "Clear, direct colors - sharp blacks and crisp whites",
+        food: "Direct, straightforward meals with clear flavors",
+        fashion: "Clear, direct style that communicates clearly",
+        lifestyle: "Direct communication, clear goals, and straightforward living"
+      },
+      empathetic: {
+        title: "The Understanding Heart",
+        desc: "You feel deeply and understand others' emotions. Your empathetic nature creates safe spaces for vulnerability.",
+        spiritAnimal: "Dove - Empathetic, peaceful, and understands emotions. You share their empathetic nature.",
+        pet: "Therapy Dog - Empathetic, understanding, and feels emotions. Perfect companion for your empathetic soul.",
+        colorPalette: "Empathetic, warm colors - soft pinks and understanding purples",
+        food: "Comforting meals that understand and nurture",
+        fashion: "Empathetic, warm style that makes others feel understood",
+        lifestyle: "Empathy, emotional support, and understanding others"
+      },
+      enthusiastic: {
+        title: "The Sparkling Firework",
+        desc: "You bring enthusiasm and excitement to everything. Your animated nature makes life more fun for everyone.",
+        spiritAnimal: "Hummingbird - Enthusiastic, animated, and full of energy. You share their enthusiastic spirit.",
+        pet: "Chihuahua - Enthusiastic, animated, and full of energy. Perfect for your enthusiastic lifestyle.",
+        colorPalette: "Enthusiastic, sparkling colors - bright yellows and electric pinks",
+        food: "Exciting meals that spark enthusiasm and joy",
+        fashion: "Enthusiastic, animated style that expresses your energy",
+        lifestyle: "Enthusiastic activities, exciting projects, and animated living"
+      },
+      thoughtful: {
+        title: "The Contemplative Sage",
+        desc: "You think deeply before speaking and act with intention. Your thoughtful nature brings wisdom to decisions.",
+        spiritAnimal: "Elephant - Thoughtful, wise, and remembers everything. You share their thoughtful wisdom.",
+        pet: "Great Dane - Thoughtful, gentle giant, and acts with intention. Perfect match for your thoughtful nature.",
+        colorPalette: "Thoughtful, wise colors - deep purples and contemplative blues",
+        food: "Thoughtfully prepared meals with intention and care",
+        fashion: "Thoughtful, intentional style with meaning",
+        lifestyle: "Thoughtful reflection, intentional actions, and wise decisions"
+      },
+      nature: {
+        title: "The Earth Guardian",
+        desc: "You're connected to nature and find peace outdoors. Your nature-loving spirit brings balance and grounding.",
+        spiritAnimal: "Wolf - Connected to nature, runs free, and understands the earth. You share their natural connection.",
+        pet: "Australian Cattle Dog - Nature-loving, active, and connected to the outdoors. Perfect for your nature lifestyle.",
+        colorPalette: "Natural, earthy colors - forest greens and earth browns",
+        food: "Natural, organic meals from the earth",
+        fashion: "Natural, earthy style that connects to nature",
+        lifestyle: "Outdoor activities, nature connection, and earth-centered living"
+      },
+      creative: {
+        title: "The Artistic Soul",
+        desc: "You see beauty everywhere and express it creatively. Your artistic nature brings color and inspiration to the world.",
+        spiritAnimal: "Peacock - Creative, beautiful, and expresses artfully. You share their creative expression.",
+        pet: "Pomeranian - Creative, expressive, and full of personality. Perfect companion for your creative spirit.",
+        colorPalette: "Creative, artistic colors - all colors expressing your artistic vision",
+        food: "Artistically presented meals that are creative expressions",
+        fashion: "Creative, artistic style that expresses your vision",
+        lifestyle: "Creative projects, artistic expression, and bringing beauty to life"
+      },
+      achievement: {
+        title: "The Success Seeker",
+        desc: "You're driven by goals and love achieving them. Your achievement-focused nature inspires others to reach higher.",
+        spiritAnimal: "Horse - Achievement-focused, driven, and reaches goals. You share their drive for success.",
+        pet: "Belgian Malinois - Achievement-focused, driven, and goal-oriented. Perfect match for your achievement nature.",
+        colorPalette: "Success colors - golds, silvers, and achievement blues",
+        food: "Goal-supporting meals that fuel achievement",
+        fashion: "Success-oriented style that reflects achievement",
+        lifestyle: "Goal-setting, achievement, and reaching for success"
+      }
+    };
+
+    // ─── Helper Functions ─────────────────────────────────────────────────
+
+    /**
+     * Starts the quiz by hiding welcome screen and showing quiz screen.
+     */
+    function startQuiz() {
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('quizScreen').classList.add('active');
+      showQuestion();
+    }
+
+    /**
+     * Displays the current question and options.
+     */
+    function showQuestion() {
+      const question = questions[currentQuestion];
+      document.getElementById('questionText').textContent = question.question;
+      
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = '';
+      
+      question.options.forEach((option, index) => {
+        const optionEl = document.createElement('div');
+        optionEl.className = 'option';
+        optionEl.textContent = option.text;
+        optionEl.setAttribute('data-value', option.value);
+        optionEl.onclick = () => selectOption(optionEl, option.value);
+        optionsContainer.appendChild(optionEl);
+      });
+
+      // Update progress
+      const progress = ((currentQuestion + 1) / questions.length) * 100;
+      document.getElementById('progressText').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+
+      // Reset selection
+      selectedOption = null;
+      document.getElementById('nextBtn').classList.remove('enabled');
+    }
+
+    /**
+     * Handles option selection.
+     */
+    function selectOption(optionEl, value) {
+      // Remove previous selection
+      document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+      
+      // Select new option
+      optionEl.classList.add('selected');
+      selectedOption = value;
+      
+      // Enable next button
+      document.getElementById('nextBtn').classList.add('enabled');
+    }
+
+    /**
+     * Moves to the next question or shows results.
+     */
+    function nextQuestion() {
+      if (!selectedOption) return;
+
+      answers.push(selectedOption);
+      currentQuestion++;
+
+      if (currentQuestion < questions.length) {
+        // Fade out current question
+        const quizScreen = document.getElementById('quizScreen');
+        quizScreen.style.opacity = '0';
+        quizScreen.style.transform = 'translateX(-50px)';
+        
+        setTimeout(() => {
+          showQuestion();
+          quizScreen.style.opacity = '1';
+          quizScreen.style.transform = 'translateX(0)';
+        }, 300);
+      } else {
+        // Show results
+        showResults();
+      }
+    }
+
+    /**
+     * Calculates results based on answers.
+     */
+    function calculateResults() {
+      // Count occurrences of each trait
+      const traitCounts = {};
+      answers.forEach(answer => {
+        traitCounts[answer] = (traitCounts[answer] || 0) + 1;
+      });
+
+      // Find dominant trait
+      let dominantTrait = answers[0];
+      let maxCount = traitCounts[answers[0]];
+      for (const [trait, count] of Object.entries(traitCounts)) {
+        if (count > maxCount) {
+          maxCount = count;
+          dominantTrait = trait;
+        }
+      }
+
+      // Calculate green flag vs red flag
+      // Green flags: positive traits, red flags: traits that might need balance
+      const greenFlagTraits = ['calm', 'social', 'adventurous', 'intellectual', 'analytical', 'collaborative', 
+                               'warm', 'cool', 'soft', 'expressive', 'practical', 'humorous', 'leader', 
+                               'supporter', 'energetic', 'comfort', 'healthy', 'sweet', 'methodical', 
+                               'reflective', 'empathetic', 'enthusiastic', 'thoughtful', 'nature', 
+                               'creative', 'achievement'];
+      const redFlagTraits = ['introvert', 'reserved', 'bold', 'direct', 'flexible', 'intuitive', 'observer', 'active'];
+
+      let greenFlagCount = 0;
+      let redFlagCount = 0;
+
+      answers.forEach(answer => {
+        if (greenFlagTraits.includes(answer)) {
+          greenFlagCount++;
+        } else if (redFlagTraits.includes(answer)) {
+          redFlagCount++;
+        } else {
+          // Neutral or balanced traits
+          greenFlagCount += 0.5;
+          redFlagCount += 0.5;
+        }
+      });
+
+      const total = greenFlagCount + redFlagCount;
+      const greenFlagPercent = Math.round((greenFlagCount / total) * 100);
+      const redFlagPercent = 100 - greenFlagPercent;
+
+      // Generate improvement tips based on answers
+      const tips = generateTips(answers, dominantTrait);
+
+      return {
+        personalityType: personalityTypes[dominantTrait] || personalityTypes.calm,
+        greenFlagPercent,
+        redFlagPercent,
+        tips
+      };
+    }
+
+    /**
+     * Generates personalized improvement tips.
+     */
+    function generateTips(answers, dominantTrait) {
+      const tips = [];
+      const tipBank = {
+        emotional: [
+          "Practice mindfulness meditation for 10 minutes daily to enhance emotional balance.",
+          "Keep a gratitude journal to focus on positive aspects of your life.",
+          "Learn to express your emotions healthily through art, writing, or conversation."
+        ],
+        communication: [
+          "Practice active listening - focus fully on what others are saying before responding.",
+          "Use 'I' statements to express your feelings without blaming others.",
+          "Ask open-ended questions to deepen your conversations and connections."
+        ],
+        confidence: [
+          "Set small, achievable goals and celebrate each success to build confidence.",
+          "Practice positive self-talk and challenge negative thoughts.",
+          "Step outside your comfort zone regularly to expand your confidence zone."
+        ],
+        growth: [
+          "Read books or take courses in areas that interest you to continue growing.",
+          "Seek feedback from trusted friends or mentors to gain new perspectives.",
+          "Reflect on your experiences regularly to learn and grow from them."
+        ],
+        balance: [
+          "Create boundaries between work and personal time to maintain balance.",
+          "Schedule regular breaks and self-care activities in your routine.",
+          "Learn to say 'no' when needed to protect your energy and well-being."
+        ],
+        connection: [
+          "Make time for meaningful conversations with friends and family.",
+          "Join groups or communities that share your interests and values.",
+          "Practice empathy by trying to understand others' perspectives."
+        ]
+      };
+
+      // Add tips based on traits
+      if (answers.includes('introvert') || answers.includes('reserved')) {
+        tips.push(...tipBank.communication.slice(0, 2));
+        tips.push(...tipBank.confidence.slice(0, 1));
+      }
+      if (answers.includes('social') || answers.includes('expressive')) {
+        tips.push(...tipBank.balance.slice(0, 2));
+      }
+      if (answers.includes('analytical') || answers.includes('methodical')) {
+        tips.push(...tipBank.emotional.slice(0, 2));
+      }
+      if (answers.includes('active') || answers.includes('energetic')) {
+        tips.push(...tipBank.balance.slice(0, 1));
+        tips.push(...tipBank.growth.slice(0, 1));
+      }
+
+      // Fill remaining tips
+      while (tips.length < 5) {
+        const categories = Object.keys(tipBank);
+        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+        const randomTip = tipBank[randomCategory][Math.floor(Math.random() * tipBank[randomCategory].length)];
+        if (!tips.includes(randomTip)) {
+          tips.push(randomTip);
+        }
+      }
+
+      return tips.slice(0, 6);
+    }
+
+    /**
+     * Displays the results screen with animated content.
+     */
+    function showResults() {
+      const quizScreen = document.getElementById('quizScreen');
+      quizScreen.style.opacity = '0';
+      quizScreen.style.transform = 'translateX(50px)';
+      
+      setTimeout(() => {
+        quizScreen.classList.remove('active');
+        
+        const resultsScreen = document.getElementById('resultsScreen');
+        const results = calculateResults();
+        
+        // Update personality info
+        document.getElementById('personalityTitle').textContent = results.personalityType.title;
+        document.getElementById('personalityDesc').textContent = results.personalityType.desc;
+        document.getElementById('spiritAnimal').textContent = results.personalityType.spiritAnimal;
+        document.getElementById('bestPet').textContent = results.personalityType.pet;
+        document.getElementById('colorPalette').textContent = results.personalityType.colorPalette;
+        document.getElementById('idealFood').textContent = results.personalityType.food;
+        document.getElementById('fashionStyle').textContent = results.personalityType.fashion;
+        document.getElementById('lifestyle').textContent = results.personalityType.lifestyle;
+
+        // Update flag meters with animation
+        setTimeout(() => {
+          document.getElementById('greenFlagPercent').textContent = `${results.greenFlagPercent}%`;
+          document.getElementById('redFlagPercent').textContent = `${results.redFlagPercent}%`;
+          document.getElementById('greenFlagBar').style.width = `${results.greenFlagPercent}%`;
+          document.getElementById('greenFlagBar').textContent = `${results.greenFlagPercent}%`;
+          document.getElementById('redFlagBar').style.width = `${results.redFlagPercent}%`;
+          document.getElementById('redFlagBar').textContent = `${results.redFlagPercent}%`;
+        }, 100);
+
+        // Update tips
+        const tipsList = document.getElementById('tipsList');
+        tipsList.innerHTML = '';
+        results.tips.forEach(tip => {
+          const li = document.createElement('li');
+          li.textContent = tip;
+          tipsList.appendChild(li);
+        });
+
+        // Show results screen
+        resultsScreen.classList.add('active');
+        
+        // Generate share text
+        generateShareText(results);
+      }, 300);
+    }
+
+    /**
+     * Generates shareable text summary.
+     */
+    function generateShareText(results) {
+      const shareText = `
+🌟 MY PERSONALITY QUIZ RESULTS 🌟
+
+${results.personalityType.title}
+${results.personalityType.desc}
+
+🦋 Spirit Animal: ${results.personalityType.spiritAnimal.split(' - ')[0]}
+${results.personalityType.spiritAnimal.split(' - ')[1]}
+
+🐾 Best Pet: ${results.personalityType.pet.split(' - ')[0]}
+${results.personalityType.pet.split(' - ')[1]}
+
+✨ What Suits Me:
+• Colors: ${results.personalityType.colorPalette}
+• Food: ${results.personalityType.food}
+• Fashion: ${results.personalityType.fashion}
+• Lifestyle: ${results.personalityType.lifestyle}
+
+🚩 Green Flag: ${results.greenFlagPercent}% | Red Flag: ${results.redFlagPercent}%
+
+💡 Improvement Tips:
+${results.tips.map((tip, i) => `${i + 1}. ${tip}`).join('\n')}
+
+Take the quiz at: Personality Quiz App
+      `.trim();
+      
+      document.getElementById('shareTextarea').value = shareText;
+    }
+
+    /**
+     * Resets quiz to start over.
+     */
+    function retakeQuiz() {
+      // Reset state
+      currentQuestion = 0;
+      answers = [];
+      selectedOption = null;
+      
+      // Hide results screen
+      const resultsScreen = document.getElementById('resultsScreen');
+      resultsScreen.classList.remove('active');
+      
+      // Hide share section
+      const shareSection = document.getElementById('shareSection');
+      shareSection.classList.remove('active');
+      
+      // Show quiz screen
+      const quizScreen = document.getElementById('quizScreen');
+      quizScreen.classList.add('active');
+      
+      // Reset progress bar
+      document.getElementById('progressBar').style.width = '10%';
+      document.getElementById('progressText').textContent = 'Question 1 of 10';
+      
+      // Reset next button
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.classList.remove('enabled');
+      
+      // Show first question
+      showQuestion();
+    }
+
+    /**
+     * Toggles share section visibility.
+     */
+    function toggleShare() {
+      const shareSection = document.getElementById('shareSection');
+      const isActive = shareSection.classList.contains('active');
+      
+      if (isActive) {
+        shareSection.classList.remove('active');
+      } else {
+        shareSection.classList.add('active');
+        // Scroll to share section smoothly
+        setTimeout(() => {
+          shareSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+    }
+
+    /**
+     * Copies result text to clipboard.
+     */
+    function copyResult() {
+      const textarea = document.getElementById('shareTextarea');
+      const text = textarea.value;
+      const copyBtn = document.querySelector('.copy-btn');
+      const originalText = copyBtn.textContent;
+      
+      // Use modern clipboard API if available
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          copyBtn.textContent = '✓ Copied!';
+          copyBtn.classList.add('copied');
+          
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        }).catch(() => {
+          // Fallback to execCommand
+          fallbackCopy(text, copyBtn, originalText);
+        });
+      } else {
+        // Fallback for older browsers
+        fallbackCopy(text, copyBtn, originalText);
+      }
+    }
+    
+    /**
+     * Fallback copy method using execCommand.
+     */
+    function fallbackCopy(text, copyBtn, originalText) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        document.execCommand('copy');
+        copyBtn.textContent = '✓ Copied!';
+        copyBtn.classList.add('copied');
+        
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      } catch (err) {
+        alert('Failed to copy. Please select and copy manually.');
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+  </script>
+</body>
+</html>
